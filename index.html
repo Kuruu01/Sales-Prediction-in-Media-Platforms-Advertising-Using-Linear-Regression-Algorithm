@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        nav {
+            margin-bottom: 20px;
+            position: fixed;
+        }
+
+        nav a {
+            text-decoration: none;
+            padding: 10px;
+            margin: 0 10px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0;
+        }
+
+        input {
+            width: 200px;
+            padding: 5px;
+        }
+        button {
+        color: #fff;
+        background: #2B2663;
+        padding: 12px 30px;
+        border: none;
+        font-size: 1rem;
+        border-radius: 6px;
+        margin-top: 38px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: 0.2s ease;
+        }
+        button:hover {
+        color: #fff;
+        background: #A3B5C2;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            line-height: 1.2;
+            color: #747474;
+            margin-bottom: 1rem;
+            font-weight: normal;
+            text-align: start;
+            padding-right: 5rem;
+        }
+
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            margin-top: 20px;
+            margin-right: 1%;
+            margin-bottom: 2%;
+            margin-left: 1%;
+            border: 1px solid #f3f3f3;
+            border-radius: 4px;
+            background-color: #fff;
+            box-shadow: 11px 11px 15px -5px rgba(0, 0, 0, .1);
+            color: #333;
+        }
+
+        .home {
+        height: 100vh;
+        background-image: url('images/homepage.png');
+        background-position: center;
+        background-size: cover;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        }
+        .home .content {
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+        color: #2B2663;
+        }
+        .home .content h2 {
+        font-size: 3rem;
+        max-width: 600px;
+        line-height: 70px;
+        }
+        .home .content p {
+        font-weight: 300;
+        max-width: 600px;
+        margin-top: 15px;
+        }
+        .home .content button {
+        color: #fff;
+        background: #2B2663;
+        padding: 12px 30px;
+        border: none;
+        font-size: 1rem;
+        border-radius: 6px;
+        margin-top: 38px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: 0.2s ease;
+        }
+        .home .content button:hover {
+        color: #fff;
+        background: #A3B5C2;
+        }
+        .dashboard{
+            height: 100vh;
+            padding-top: 35px;
+            min-height: 100vh;
+            padding-left: 80px;
+            text-align: center;
+            padding-right: 80px;
+        }
+
+        .about{
+            padding-top: 35px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .predict{
+            padding-top: 35px;
+            min-height: 100vh;
+
+            text-align: center;
+            margin: 20px;
+        }
+
+        .cardsection{
+            display: flex;
+
+        }
+
+        .boxbox {
+        -webkit-box-flex: 1;
+        flex: 1;
+        display: flex;
+        flex-direction: column; /* Updated to vertical orientation */
+        }
+
+        .boxpad {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        }
+
+        .result-card {
+            margin-top: 1rem;
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .resultdash {
+            margin-top: 1rem;
+            font-size: 2rem;
+        }
+
+        .allcard {
+            -webkit-box-flex: 1;
+            flex: 1;
+            width: 48%;
+            margin-right: 1%;
+            margin-bottom: 2%;
+            margin-left: 1%;
+            border: 1px solid #f3f3f3;
+            border-radius: 4px;
+            background-color: #fff;
+            box-shadow: 11px 11px 15px -5px rgba(0, 0, 0, .1);
+            color: #333;
+        }
+        .formbox {
+            padding: 40px;
+            background: #fff;
+            max-width: 360px;
+            border-radius: 20px;
+            margin: 60px auto;
+            box-shadow: 0 5px 10px rgba(154,160,185,.05), 0 15px 40px rgba(166,173,201,.2);
+        }
+
+        .boxpad {
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            justify-content: flex-end;
+            -webkit-box-align: center;
+            align-items: center;
+        }
+
+        h5 {
+            font-size: 1rem;
+            line-height: 1.2;
+            color: #747474;
+            margin-top: 2px;
+            margin-bottom: 1rem;
+            font-weight: normal;
+        }
+
+        #influencerType {
+        width: 200px; /* Set your desired width */
+        padding: 5px;
+    }
+    .space {
+        margin-right: -4rem;
+        transform: rotate(270deg);
+    }
+    .p5 {
+        transform: rotate(360deg);
+        font-size: 1rem;
+        color: #747474;
+        font-weight: normal;
+    }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
+    
+</head>
+
+<body>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#predict">Sales Prediction Form</a>
+        <a href="#dashboard">Dashboard</a>
+    </nav>
+
+    <section id="home" class="home">
+        <div class="content">
+          <h2>Sales Prediction Application</h2>
+          <p>
+            Sales Prediction in Media Platform Advertising Expenditure
+            Using Linear Regression
+          </p>
+          <button onclick="goToPredict()">Predict Sales</button>
+        </div>
+    </section>
+
+    <div class="formbox">
+        <div id="predict" class="predict">
+            <h2>Predict Sales</h2>
+            <label for="tv">TV Budget:</label>
+            <input type="text" id="tv" placeholder="RM">
+
+            <label for="radio">Radio Budget:</label>
+            <input type="text" id="radio" placeholder="RM">
+
+            <label for="socialMedia">Social Media Budget:</label>
+            <input type="text" id="socialMedia" placeholder="RM">
+
+            <label for="influencerType">Influencer Type:</label>
+            <select name="influencerType" id="influencerType">
+                <option value="Macro">Macro</option>
+                <option value="Mega">Mega</option>
+                <option value="Micro">Micro</option>
+                <option value="Nano">Nano</option>
+            </select>
+
+            <br><button onclick="predictSales(); goToDashboard();">Predict Sales</button>
+            <button onclick="refreshForm()">Refresh</button>
+        </div>
+    </div>
+
+    <div id="dashboard" class="dashboard">
+        <h4></h4>
+        <div class="cardsection">
+            <!-- First Card: Predicted Sales -->
+            <div class="allcard">
+                <div class="boxbox">
+                    <div class="boxpad">
+                        <div id="sales" class="result-card"></div>
+                        <h5>Predicted Sales</h5>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Second Card: Total Cost -->
+            <div class="allcard">
+                <div class="boxbox">
+                    <div class="boxpad">
+                        <div id="total_cost" class="result-card"></div>
+                        <h5>Total Cost</h5>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Third Card: Total Profit -->
+            <div class="allcard">
+                <div class="boxbox">
+                    <div class="boxpad">
+                        <div id="total_profit" class="result-card"></div>
+                        <h5>Total Profit</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chart-container">
+            <div class="space">
+                <p class="p5">% of Profit Each Media</p>
+            </div>
+            <canvas id="profitChart" width="500" height="250"></canvas>
+            <div class="space">
+                <p class="p5">% of Cost Each Media</p>
+            </div>
+            <canvas id="costChart" width="500" height="250"></canvas>
+        </div>
+        <div class="chart-container">
+            <div id="result" width="500" height="250"></div>
+            <div class="space">
+                <p class="p5">% of Sales Each Media</p>
+            </div>
+            <canvas id="salesChart" width="500" height="250"></canvas>
+        </div>
+    </div>
+
+    </div>
+
+
+    <script>
+    window.addEventListener("scroll", function() {
+            var nav = document.querySelector("nav");
+            nav.classList.toggle("sticky", window.scrollY > 0);
+        });
+
+        function goToPredict() {
+            document.getElementById("predict").scrollIntoView({ behavior: 'smooth' });
+        }
+        function goToDashboard() {
+            document.getElementById("dashboard").scrollIntoView({ behavior: 'smooth' });
+        }
+        function refreshForm() {
+    // Clear input fields
+    document.getElementById("tv").value = "";
+    document.getElementById("radio").value = "";
+    document.getElementById("socialMedia").value = "";
+    document.querySelector("[name='influencerType']").value = "";
+
+    // Clear card result
+    document.getElementById("sales").innerHTML = "";
+    document.getElementById("total_profit").innerHTML = "";
+    document.getElementById("total_cost").innerHTML = "";
+
+    // Clear charts
+    clearChart('profitChart');
+    clearChart('costChart');
+    clearChart('salesChart');
+
+    document.getElementById("result").innerHTML = "";
+}
+
+function clearChart(chartId) {
+    if (window[chartId] && typeof window[chartId].destroy === 'function') {
+        window[chartId].destroy();
+    }
+    var canvas = document.getElementById(chartId);
+    var context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+    function predictSales() {
+    var tv = parseFloat(document.getElementById('tv').value);
+    var radio = parseFloat(document.getElementById('radio').value);
+    var socialMedia = parseFloat(document.getElementById('socialMedia').value);
+    var influencerType = document.getElementById('influencerType').value;
+
+    var input_data = {
+        tv: tv,
+        radio: radio,
+        socialMedia: socialMedia,
+        influencerType: influencerType
+    };
+
+    fetch('http://localhost:5000/predict', {  // Adjust the URL if your Flask app is running on a different port
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(input_data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+    // Calculate revenue for each medium
+    var revenue_tv = tv * (data.prediction / (tv + radio + socialMedia));
+    var revenue_radio = radio * (data.prediction / (tv + radio + socialMedia));
+    var revenue_social_media = socialMedia * (data.prediction / (tv + radio + socialMedia));
+
+    console.log("Revenue for each medium:", revenue_tv, revenue_radio, revenue_social_media);
+
+    // Calculate total cost, revenue, total profit, and profit for each medium
+    var total_cost = tv + radio + socialMedia;
+    var revenue = data.prediction;
+    var total_profit = revenue - total_cost;
+
+    console.log("Total Cost:", total_cost);
+    console.log("Total Profit:", total_profit);
+
+    // Corrected profit calculation for each medium
+    var profit_tv = tv * (total_profit / total_cost);
+    var profit_radio = radio * (total_profit / total_cost);
+    var profit_social_media = socialMedia * (total_profit / total_cost);
+    var profit_influencer = 0;  // Assuming no cost associated with influencer collaboration
+
+    console.log("Profit for each medium:", profit_tv, profit_radio, profit_social_media);
+
+    // Display the result in the 'sales' div
+    document.getElementById("result").innerHTML = 'Advertising Expenditure' + "<br><br>" + 
+    'Television Advertising: RM ' + tv.toFixed(2) + "<br>" +
+    'Radio Advertising: RM ' + radio.toFixed(2) + "<br>" +
+    'Social Media Advertising: RM ' + socialMedia.toFixed(2) + "<br>" +
+    'Influencer Collaboration Type: ' + influencerType;
+
+    document.getElementById("sales").innerHTML = 'RM ' + data.prediction.toFixed(2);
+    document.getElementById("total_profit").innerHTML = 'RM ' + total_profit.toFixed(2);
+    document.getElementById("total_cost").innerHTML = 'RM ' + total_cost.toFixed(2);
+    
+    // Update the pie charts with profit and cost values
+    updateProfitChart(profit_tv, profit_radio, profit_social_media);
+    updateCostChart(tv, radio, socialMedia);
+    updateSalesChart(revenue_tv, revenue_radio, revenue_social_media);
+})
+.catch(error => {
+    console.error('There was a problem with the fetch operation:', error);
+});
+
+function updateProfitChart(profit_tv, profit_radio, profit_social_media) {
+    var profitData = {
+        labels: ['Television Ads', 'Radio Ads', 'Social Media Ads'],
+        datasets: [{
+            data: [profit_tv.toFixed(2), profit_radio.toFixed(2), profit_social_media.toFixed(2)],
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+            hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+        }]
+    };
+
+    var profitOptions = {
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Percentage of Profit from Each Platform',
+                font: {
+                    size: 16
+                }
+            }
+        }
+    };
+
+    updateChart('profitChart', 'pie', profitData, profitOptions);
+}
+
+function updateCostChart(tv, radio, socialMedia) {
+    var costData = {
+        labels: ['Television Ads', 'Radio Ads', 'Social Media Ads'],
+        datasets: [{
+            data: [tv, radio, socialMedia],
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+            hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+        }]
+    };
+
+    var costOptions = {
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Percentage of Cost on Each Platform',
+                font: {
+                    size: 16
+                }
+            }
+        }
+    };
+
+    updateChart('costChart', 'doughnut', costData, costOptions);
+}
+
+function updateSalesChart(revenue_tv, revenue_radio, revenue_social_media) {
+    var salesData = {
+        labels: ['Television Ads', 'Radio Ads', 'Social Media Ads'],
+        datasets: [{
+            label: 'Sales',
+            data: [revenue_tv.toFixed(2), revenue_radio.toFixed(2), revenue_social_media.toFixed(2)],
+            backgroundColor: ['rgb(75, 192, 192)', 'rgb(75, 192, 192)', 'rgb(75, 192, 192)'],
+            hoverBackgroundColor: ['rgb(75, 192, 192)', 'rgb(75, 192, 192)', 'rgb(75, 192, 192)']
+        }]
+    };
+
+    var salesOptions = {
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Percentage of Sales from Each Platform',
+                font: {
+                    size: 16
+                }
+            }
+        }
+    };
+
+    updateChart('salesChart', 'horizontalBar', salesData, salesOptions);
+}
+function updateChart(chartId, chartType, data, options) {
+    var chartCtx = document.getElementById(chartId).getContext('2d');
+
+    // Check if the chart instance exists and has a destroy method
+    if (window[chartId] && typeof window[chartId].destroy === 'function') {
+        window[chartId].destroy();
+    }
+
+    window[chartId] = new Chart(chartCtx, {
+        type: chartType,
+        data: data,
+        options: options
+    });
+}
+    }
+    </script>
+</body>
+</html>
